@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softlab.progressmanager.core.mapper.ClassMapper">
+    <resultMap id="CClass" type="com.softlab.progressmanager.core.model.CClass">
+        <result property="classId" column="class_id"/>
+        <result property="className" column="class_name"/>
+        <result property="classStudentNum" column="class_stu_num"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+
+    <insert id="insertClass">
+        insert into classes
+        (user_id, class_name, class_stu_num)
+        value
+        (#{userId}, #{className}, #{classStudentNum})
+    </insert>
+
+    <delete id="deleteClassById">
+        delete from  classes
+        where class_id = #{classId}
+    </delete>
+
+    <update id="updateClass">
+        update classes
+        <set>
+            <if test="class.className != null and '' != class.className">
+                class_name = #{class.className},
+            </if>
+            <if test="class.classStudentNum != null">
+                class_stu_num = #{class.classStudentNum}
+            </if>
+        </set>
+        where class_id = #{classId}
+    </update>
+
+    <select id="selectClassById" resultMap="CClass">
+        select * from classes
+        where class_id = #{classId}
+    </select>
+
+    <select id="selectClassByUserId" resultMap="CClass">
+        select * from classes
+        where user_id = #{userId}
+    </select>
+
+</mapper>

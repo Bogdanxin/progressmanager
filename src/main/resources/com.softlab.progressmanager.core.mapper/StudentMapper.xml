@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softlab.progressmanager.core.mapper.StudentMapper">
+    <resultMap id="Student" type="com.softlab.progressmanager.core.model.Student">
+        <result column="stu_id" property="studentId"/>
+        <result column="class_id" property="classId"/>
+        <result column="stu_name" property="studentName"/>
+        <result column="absence_times" property="absenceTimes"/>
+    </resultMap>
+
+    <insert id="insertStudent">
+        insert into students
+        (stu_id, stu_name, absence_times, class_id)
+        values
+        (#{studentId}, #{studentName}, 0, #{classId})
+    </insert>
+
+    <delete id="deleteStudentById">
+        delete from students
+        where stu_id = #{studentId}
+        and class_id = #{classId}
+    </delete>
+
+    <update id="updateStudentById">
+        update students
+        <set>
+            <if test="student.studentName != null and '' != student.studentName">
+                stu_name = #{student.studentName},
+            </if>
+            <if test="student.absenceTimes != null">
+                absence_times = #{student.absenceTimes}
+            </if>
+        </set>
+        where stu_id = #{studentId}
+        and class_id = #{classId}
+    </update>
+
+    <select id="selectStudentById" resultMap="Student">
+        select * from students
+        where stu_id = #{studentId}
+        and class_id = #{classId}
+    </select>
+
+    <update id="absenceStudent">
+        update students
+        set absence_times = absence_times + 1
+        where stu_id = #{studentId}
+        and class_id = #{classId}
+    </update>
+
+    <update id="absenceStudentLift">
+        update students
+        set absence_times = (
+        case
+        when absence_times > 0 then absence_times - 1
+        end)
+        where stu_id =  #{studentId}
+        and class_id = #{classId}
+    </update>
+
+    <select id="selectStudentsByClassId" resultMap="Student">
+        select * from students
+        where class_id = #{classId}
+    </select>
+</mapper>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softlab.progressmanager.core.mapper.UserMapper">
+    <resultMap id="User" type="com.softlab.progressmanager.core.model.User">
+        <result column="user_id" property="userId"/>
+        <result column="teacher_id" property="teacherId"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_password" property="password"/>
+        <result column="user_academy" property="userAcademy"/>
+        <result column="user_token" property="token"/>
+        <result column="user_type" property="userType"/>
+    </resultMap>
+
+    <delete id="deleteUserById">
+        delete from users where user_id = #{userId}
+    </delete>
+
+    <insert id="insertUser">
+        insert into users
+        (teacher_id, user_name, user_password,
+        user_academy, user_token, user_type)
+        value
+        (#{teacherId}, #{userName}, #{password},
+        #{userAcademy}, "", 0)
+    </insert>
+
+    <update id="updateUserById">
+        update users
+        <set>
+            <if test="user.teacherId != null">
+                teacher_id = #{user.teacherId},
+            </if>
+            <if test="user.userName != null and '' != user.userName">
+                user_name = #{user.userName},
+            </if>
+            <if test="user.userAcademy != null and '' != user.userAcademy">
+                user_academy = #{user.userAcademy},
+            </if>
+            <if test="user.token != null and '' != user.token">
+                user_token = #{user.token},
+            </if>
+            <if test="user.userType != null">
+                user_type = #{user.userType}
+            </if>
+        </set>
+        where user_id = #{userId}
+    </update>
+
+    <select id="selectUserById" resultMap="User">
+        select * from users
+        where user_id = #{userId}
+    </select>
+
+    <select id="selectUserByCondition" resultMap="User">
+        select * from users
+        <where>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="teacherId != null">
+                and teacher_id = #{teacherId}
+            </if>
+            <if test="userAcademy != null and '' != userAcademy">
+                and user_academy = #{userAcademy}
+            </if>
+            <if test="token != null and '' != token">
+                and user_token = #{tokne}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateTokenNullById">
+        update users
+        set user_token = ""
+        where user_id = #{userId}
+    </update>
+
+    <select id="selectUserByPasswordAndId" resultMap="User">
+        select * from users
+        where teacher_id = #{teacherId}
+        and user_password = #{password}
+    </select>
+
+    <select id="selectUserByToken" resultMap="User">
+        select * from users where user_token = #{token}
+    </select>
+
+    <select id="selectUsersByTeacherId" resultMap="User">
+        select * from users where teacher_id = #{teacherId}
+    </select>
+
+    <update id="updateTokenByUser">
+        update users
+        set user_token = #{token}
+        where user_id = #{userId}
+    </update>
+</mapper>

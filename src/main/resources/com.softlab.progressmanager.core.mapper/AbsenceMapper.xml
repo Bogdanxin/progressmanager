@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softlab.progressmanager.core.mapper.AbsenceMapper">
+    <resultMap id="Absence" type="com.softlab.progressmanager.core.model.Absence">
+        <result property="studentId" column="stu_id"/>
+        <result property="courseId" column="cou_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <insert id="insertAbsence">
+        insert into absences
+        (stu_id, cou_id, create_time)
+        values
+        (#{studentId}, #{courseId}, #{createTime})
+    </insert>
+
+    <delete id="deleteAbsenceById">
+        delete from absences
+        where stu_id = #{studentId}
+        and cou_id = #{courseId}
+        and create_time = #{date}
+    </delete>
+
+    <select id="selectAbsenceByCourseId" resultMap="Absence">
+        select * from
+        absences
+        where cou_id = #{courseId}
+    </select>
+
+    <select id="selectAbsenceByDate" resultMap="Absence">
+        select * from
+        absences
+        where create_time = #{createTime}
+    </select>
+
+    <select id="selectAbsenceByDateAndCourseId" resultMap="Absence">
+        select * from absences
+        where cou_id = #{courseId}
+        and create_time = #{createTime}
+    </select>
+
+    <select id="selectAbsenceStudent" resultMap="Absence">
+        select * from absences
+        where cou_id = #{courseId}
+        and stu_id = #{studentId}
+    </select>
+
+    <select id="selectByDateAndStudentIdAndCourseId" resultMap="Absence">
+        select * from absences
+        where stu_id = #{studentId}
+        and cou_id = #{courseId}
+        and create_time = #{date}
+    </select>
+    
+    <select id="getStudentAbsenceNum" resultType="INTEGER">
+        SELECT COUNT(*)
+        FROM absences
+        WHERE cou_id = #{courseId}
+        AND create_time = #{createTime}
+    </select>
+
+    <delete id="deleteAbsenceByStudentId">
+        delete from absences where stu_id = #{studentId}
+    </delete>
+
+    <select id="selectAbsenceByDateAndClassId" resultMap="Absence">
+        select * from absences
+        where create_time = #{date}
+        and class_id = #{classId}
+    </select>
+</mapper>
