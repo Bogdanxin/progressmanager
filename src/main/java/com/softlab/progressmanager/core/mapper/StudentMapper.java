@@ -79,4 +79,11 @@ public interface StudentMapper {
      */
     List<Student> selectStudentsByClassId(int classId);
 
+    /**
+     * 查看指定班级下的所有学生人数
+     * @param classId
+     * @return
+     */
+    int countStudentsNumByClass(int classId);
+
 }

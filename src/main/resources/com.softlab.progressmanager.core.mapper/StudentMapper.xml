@@ -62,4 +62,10 @@
         select * from students
         where class_id = #{classId}
     </select>
+
+    <select id="countStudentsNumByClass" resultType="INTEGER">
+        select count(*)
+        from students
+        where class_id = #{classId}
+    </select>
 </mapper>

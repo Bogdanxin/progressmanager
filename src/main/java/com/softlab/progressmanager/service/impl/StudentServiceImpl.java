@@ -2,6 +2,7 @@ package com.softlab.progressmanager.service.impl;
 
 import com.softlab.progressmanager.common.ProException;
 import com.softlab.progressmanager.common.RestData;
+import com.softlab.progressmanager.common.utils.ExcelUtils;
 import com.softlab.progressmanager.core.mapper.AbsenceMapper;
 import com.softlab.progressmanager.core.mapper.ClassMapper;
 import com.softlab.progressmanager.core.mapper.StudentMapper;
@@ -9,7 +10,10 @@ import com.softlab.progressmanager.core.model.Student;
 import com.softlab.progressmanager.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +29,8 @@ import java.util.Map;
 @Service
 public class StudentServiceImpl implements StudentService {
 
+    private final static String XLS = "xls";
+    private final static String XLSX = "xlsx";
     private final StudentMapper studentMapper;
     private final AbsenceMapper absenceMapper;
     private final ClassMapper classMapper;
@@ -126,5 +132,52 @@ public class StudentServiceImpl implements StudentService {
             throw new ProException("查找失败！");
         }
         return al;
+    }
+
+    @Override
+    public List<Map<Integer, String>> insertStudentByExcel(MultipartFile file, int classId) throws ProException, IOException {
+        if (file == null) {
+            throw new ProException("文件为空！");
+        }
+        // 读取excel表中信息，并转化为Studnet
+        List<Student> students = null;
+        if (ExcelUtils.excelType(file).equalsIgnoreCase(XLS)) {
+            students = ExcelUtils.readXlsData(file.getInputStream());
+        }else if (ExcelUtils.excelType(file).equalsIgnoreCase(XLSX)){
+            students = ExcelUtils.readXlsxData(file.getInputStream());
+        }else {
+            throw new ProException("文件类型有误！请选择正确的excel文件！");
+        }
+
+        students.forEach(student -> student.setClassId(classId));
+
+        // 将表中信息储存到数据库中
+        List<Map<Integer, String>> al = new ArrayList<>();
+        for (Student student : students){
+            Map<Integer, String> map = new HashMap<>(1);
+            //判断这里的学生是不是本班
+            if (studentMapper.selectStudentById(student.getStudentId(), student.getClassId()) != null) {
+                map.put(student.getStudentId(), "该学生已经录入，无需再次记录。");
+                al.add(map);
+                continue;
+            }
+            if (studentMapper.insertStudent(student) > 0) {
+                map.put(student.getStudentId(), "录入成功！");
+            }else {
+                map.put(student.getStudentId(), "录入失败！");
+            }
+            al.add(map);
+        }
+        return al;
+    }
+
+    @Override
+    public RestData countStudentsNumByClass(int classId) throws ProException {
+        int num = studentMapper.countStudentsNumByClass(classId);
+        if (num >= 0) {
+            return new RestData(num);
+        }else {
+            throw new ProException("未知错误，统计失败！请联系开发人员。");
+        }
     }
 }

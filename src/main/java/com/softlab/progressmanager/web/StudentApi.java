@@ -3,6 +3,7 @@ package com.softlab.progressmanager.web;
 import com.softlab.progressmanager.common.ProException;
 import com.softlab.progressmanager.common.RestData;
 import com.softlab.progressmanager.common.utils.JsonUtils;
+import com.softlab.progressmanager.common.utils.TokenUtils;
 import com.softlab.progressmanager.common.utils.VerifyUtil;
 import com.softlab.progressmanager.core.model.Student;
 import com.softlab.progressmanager.service.StudentService;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -124,6 +126,33 @@ public class StudentApi {
         try {
             return new RestData(studentService.selectStudentsByClassId(classId));
         }catch (ProException ex){
+            return new RestData(1, ex.getMessage());
+        }
+    }
+
+    @PostMapping("/addStudentsByExcel")
+    public RestData addStudentsByExcel(@RequestParam("file") MultipartFile file,
+                                       @RequestParam("classId") int classId,
+                                       HttpServletRequest request) {
+        if (VerifyUtil.verifyUserType(request) != 0) {
+            return new RestData(1, "用户未授权！");
+        }
+        try {
+            return new RestData(studentService.insertStudentByExcel(file, classId));
+        }catch (Exception ex) {
+            return new RestData(1, ex.getMessage());
+        }
+    }
+
+    @GetMapping("/getStudentNum")
+    public RestData getStudentNum(@RequestParam("classId") int classId,
+                                  HttpServletRequest request) {
+        if (VerifyUtil.verifyUserType(request) != 0) {
+            return new RestData(1, "用户未授权！");
+        }
+        try {
+            return studentService.countStudentsNumByClass(classId);
+        }catch (ProException ex) {
             return new RestData(1, ex.getMessage());
         }
     }

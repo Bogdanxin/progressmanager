@@ -3,7 +3,9 @@ package com.softlab.progressmanager.service;
 import com.softlab.progressmanager.common.ProException;
 import com.softlab.progressmanager.common.RestData;
 import com.softlab.progressmanager.core.model.Student;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -71,5 +73,23 @@ public interface StudentService {
      * @throws ProException
      */
     List<Map<String, Object>> selectStudentsByClassId(int classId) throws ProException;
+
+    /**
+     * 通过excel表添加学生
+     * @param file
+     * @param classId
+     * @return
+     * @throws ProException
+     * @throws IOException
+     */
+    List<Map<Integer, String>> insertStudentByExcel(MultipartFile file, int classId) throws ProException, IOException;
+
+    /**
+     * 计算本班级所有学生数
+     * @param classId
+     * @return
+     * @throws ProException
+     */
+    RestData countStudentsNumByClass(int classId) throws ProException;
 
 }
